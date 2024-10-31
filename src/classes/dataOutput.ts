@@ -1,4 +1,4 @@
-import { Portfolio } from "../classes/Porfolio";
+import { Portfolio } from "./Porfolio";
 import { Persona } from "./Persona";
 
 const portfolio = new Portfolio();
