@@ -1,4 +1,5 @@
-import { Portfolio } from "./Portfolio";
+import { Portfolio } from "./Porfolio";
+import { Persona } from "./Persona";
 
 const portfolio = new Portfolio();
 portfolio.agregarPersona(new Persona(12345678, "John", "Doe"));
