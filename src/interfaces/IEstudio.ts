@@ -1,5 +1,6 @@
 export interface IEstudio {
-    institucion: string;
     titulo: string;
+    institucion: string;
     anio: number;
 }
+  

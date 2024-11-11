@@ -1,5 +1,7 @@
 export interface IExperiencia {
     empresa: string;
-    cargo: string;
-    periodo: string;
+    puesto: string;
+    anioInicio: number;
+    anioFin?: number;
 }
+  

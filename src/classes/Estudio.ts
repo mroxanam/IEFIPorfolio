@@ -1,5 +1,10 @@
-import { IEstudio } from "../interfaces/IEstudio";
+import { IEstudio } from '../interfaces/IEstudio';
 
 export class Estudio implements IEstudio {
-  constructor(public institucion: string, public titulo: string, public anio: number) {}
+  constructor(
+    public titulo: string,
+    public institucion: string,
+    public anio: number
+  ) {}
 }
+

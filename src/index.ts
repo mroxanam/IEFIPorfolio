@@ -1,124 +1,154 @@
-import * as readline from 'readline';
-import { Portfolio } from './porfolio';
+import * as readlineSync from 'readline-sync';
 import { Persona } from './classes/Persona';
-import { Experiencia } from './classes/Experiencia';
 import { Habilidad } from './classes/Habilidad';
 import { Estudio } from './classes/Estudio';
+import { Experiencia } from './classes/Experiencia';
 import { Expectativa } from './classes/Expectativa';
+import { PortfolioManager } from './classes/PortfolioManager';
 
-const portfolio = new Portfolio();
-const rl = readline.createInterface({
-  input: process.stdin,
-  output: process.stdout
-});
+const portfolioManager = new PortfolioManager();
 
-const menu = () => {
-  console.log("\nSeleccione una opción:");
-  console.log("1. Agregar Persona");
-  console.log("2. Listar Personas");
-  console.log("3. Agregar Experiencia");
-  console.log("4. Agregar Habilidad");
-  console.log("5. Agregar Estudio");
-  console.log("6. Agregar Expectativa");
-  console.log("7. Salir");
+function crearPersona(): void {
+  const dni = readlineSync.question('DNI: ');
+  const nombre = readlineSync.question('Nombre: ');
+  const apellido = readlineSync.question('Apellido: ');
+  const edad = parseInt(readlineSync.question('Edad: '));
 
-  rl.question("Opción: ", (opcion) => {
-    switch(opcion) {
-      case '1':
-        agregarPersona();
-        break;
-      case '2':
-        listarPersonas();
-        break;
-      case '3':
-        agregarExperiencia();
-        break;
-      case '4':
-        agregarHabilidad();
-        break;
-      case '5':
-        agregarEstudio();
-        break;
-      case '6':
-        agregarExpectativa();
-        break;
-      case '7':
-        rl.close();
-        break;
-      default:
-        console.log("Opción inválida.");
-        menu();
+  const persona = new Persona(dni, nombre, apellido, edad);
+  portfolioManager.agregarPersona(persona);
+  console.log('Persona agregada exitosamente.');
+}
+
+function seleccionarPersona(): Persona | undefined {
+  const dni = readlineSync.question('Ingrese el DNI de la persona: ');
+  return portfolioManager.buscarPersona(dni);
+}
+
+function manejarHabilidades(persona: Persona): void {
+  const opcion = readlineSync.question('¿Qué deseas hacer con las habilidades? (1. Agregar, 2. Eliminar, 3. Ver): ');
+
+  if (opcion === '1') {
+    const nombre = readlineSync.question('Nombre de la habilidad: ');
+    const nivel = readlineSync.question('Nivel de la habilidad: ');
+    persona.agregarHabilidad(new Habilidad(nombre, nivel));
+    console.log('Habilidad agregada.');
+  } else if (opcion === '2') {
+    const nombre = readlineSync.question('Nombre de la habilidad a eliminar: ');
+    persona.borrarHabilidad(nombre);
+    console.log('Habilidad eliminada.');
+  } else if (opcion === '3') {
+    console.log('Habilidades:', persona.habilidades);
+  }
+}
+
+function manejarEstudios(persona: Persona): void {
+  const opcion = readlineSync.question('¿Qué deseas hacer con los estudios? (1. Agregar, 2. Eliminar, 3. Ver): ');
+
+  if (opcion === '1') {
+    const titulo = readlineSync.question('Título del estudio: ');
+    const institucion = readlineSync.question('Institución: ');
+    const anio = parseInt(readlineSync.question('Año de finalización: '));
+    persona.agregarEstudio(new Estudio(titulo, institucion, anio));
+    console.log('Estudio agregado.');
+  } else if (opcion === '2') {
+    const titulo = readlineSync.question('Título del estudio a eliminar: ');
+    persona.borrarEstudio(titulo);
+    console.log('Estudio eliminado.');
+  } else if (opcion === '3') {
+    console.log('Estudios:', persona.estudios);
+  }
+}
+
+function manejarExperiencias(persona: Persona): void {
+  const opcion = readlineSync.question('¿Qué deseas hacer con las experiencias? (1. Agregar, 2. Eliminar, 3. Ver): ');
+
+  if (opcion === '1') {
+    const empresa = readlineSync.question('Nombre de la empresa: ');
+    const puesto = readlineSync.question('Puesto desempeñado: ');
+    const anioInicio = parseInt(readlineSync.question('Año de inicio: '));
+    const anioFin = readlineSync.question('Año de finalización (deja vacío si sigue en curso): ');
+    persona.agregarExperiencia(new Experiencia(empresa, puesto, anioInicio, anioFin ? parseInt(anioFin) : undefined));
+    console.log('Experiencia agregada.');
+  } else if (opcion === '2') {
+    const empresa = readlineSync.question('Nombre de la empresa de la experiencia a eliminar: ');
+    persona.borrarExperiencia(empresa);
+    console.log('Experiencia eliminada.');
+  } else if (opcion === '3') {
+    console.log('Experiencias:', persona.experiencias);
+  }
+}
+
+function manejarExpectativas(persona: Persona): void {
+  const opcion = readlineSync.question('¿Qué deseas hacer con las expectativas? (1. Agregar, 2. Eliminar, 3. Ver): ');
+
+  if (opcion === '1') {
+    const descripcion = readlineSync.question('Descripción de la expectativa: ');
+    persona.agregarExpectativa(new Expectativa(descripcion));
+    console.log('Expectativa agregada.');
+  } else if (opcion === '2') {
+    const descripcion = readlineSync.question('Descripción de la expectativa a eliminar: ');
+    persona.borrarExpectativa(descripcion);
+    console.log('Expectativa eliminada.');
+  } else if (opcion === '3') {
+    console.log('Expectativas:', persona.expectativas);
+  }
+}
+
+function main(): void {
+  while (true) {
+    console.log('\nOpciones:');
+    console.log('1. Agregar persona');
+    console.log('2. Seleccionar persona para editar');
+    console.log('3. Listar personas');
+    console.log('4. Salir');
+    
+    const opcion = readlineSync.question('Seleccione una opción: ');
+
+    if (opcion === '1') {
+      crearPersona();
+    } else if (opcion === '2') {
+      const persona = seleccionarPersona();
+      if (persona) {
+        console.log(`Gestionando la persona: ${persona.nombre} ${persona.apellido}`);
+        
+        while (true) {
+          console.log('\nOpciones para editar los datos de la persona:');
+          console.log('1. Manejar habilidades');
+          console.log('2. Manejar estudios');
+          console.log('3. Manejar experiencias');
+          console.log('4. Manejar expectativas');
+          console.log('5. Regresar');
+          
+          const subOpcion = readlineSync.question('Seleccione una opción: ');
+
+          if (subOpcion === '1') {
+            manejarHabilidades(persona);
+          } else if (subOpcion === '2') {
+            manejarEstudios(persona);
+          } else if (subOpcion === '3') {
+            manejarExperiencias(persona);
+          } else if (subOpcion === '4') {
+            manejarExpectativas(persona);
+          } else if (subOpcion === '5') {
+            break;
+          } else {
+            console.log('Opción no válida.');
+          }
+        }
+      } else {
+        console.log('Persona no encontrada.');
+      }
+    } else if (opcion === '3') {
+      portfolioManager.listarPersonas();
+    } else if (opcion === '4') {
+      console.log('Saliendo...');
+      break;
+    } else {
+      console.log('Opción no válida.');
     }
-  });
-};
+  }
+}
 
-const agregarPersona = () => {
-  rl.question("Ingrese DNI: ", (dni) => {
-    rl.question("Ingrese nombre: ", (nombre) => {
-      rl.question("Ingrese apellido: ", (apellido) => {
-        portfolio.agregarPersona(new Persona(dni, nombre, apellido));
-        console.log("Persona agregada correctamente.");
-        menu();
-      });
-    });
-  });
-};
-
-const listarPersonas = () => {
-  const personas = portfolio.listarPersonas();
-  console.log("Personas:");
-  personas.forEach((persona, index) => {
-    console.log(`${index + 1}. DNI: ${persona.dni}, Nombre: ${persona.nombre}, Apellido: ${persona.apellido}`);
-  });
-  menu();
-};
-
-const agregarExperiencia = () => {
-  rl.question("Ingrese empresa: ", (empresa) => {
-    rl.question("Ingrese puesto: ", (puesto) => {
-      rl.question("Ingrese años: ", (años) => {
-        const experiencia = new Experiencia(empresa, puesto, parseInt(años));
-        portfolio.agregarExperiencia(experiencia);
-        console.log("Experiencia agregada correctamente.");
-        menu();
-      });
-    });
-  });
-};
-
-const agregarHabilidad = () => {
-  rl.question("Ingrese nombre de la habilidad: ", (nombre) => {
-    rl.question("Ingrese nivel de la habilidad (Básico, Intermedio, Avanzado): ", (nivel) => {
-      const habilidad = new Habilidad(nombre, nivel);
-      portfolio.agregarHabilidad(habilidad);
-      console.log("Habilidad agregada correctamente.");
-      menu();
-    });
-  });
-};
-
-const agregarEstudio = () => {
-  rl.question("Ingrese institución: ", (institucion) => {
-    rl.question("Ingrese título: ", (titulo) => {
-      rl.question("Ingrese año de finalización: ", (añoFinalizacion) => {
-        const estudio = new Estudio(institucion, titulo, parseInt(añoFinalizacion));
-        portfolio.agregarEstudio(estudio);
-        console.log("Estudio agregado correctamente.");
-        menu();
-      });
-    });
-  });
-};
-
-const agregarExpectativa = () => {
-  rl.question("Ingrese descripción de la expectativa: ", (descripcion) => {
-    const expectativa = new Expectativa(descripcion);
-    portfolio.agregarExpectativa(expectativa);
-    console.log("Expectativa agregada correctamente.");
-    menu();
-  });
-};
-
-menu();
+main();
 
 
